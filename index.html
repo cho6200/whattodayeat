@@ -20,11 +20,12 @@
       font-size: 1.1rem;
       margin-bottom: 30px;
     }
-    .button-container {
+    .button-container, .exclude-container {
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 12px;
+      margin-bottom: 30px;
     }
     button {
       padding: 12px 20px;
@@ -35,30 +36,16 @@
       cursor: pointer;
       color: white;
     }
-    .btn-black {
-      background-color: #333;
-    }
-    .btn-black:hover {
-      background-color: #111;
-    }
-    .btn-green {
-      background-color: #4caf50;
-    }
-    .btn-green:hover {
-      background-color: #388e3c;
-    }
-    .btn-blue {
-      background-color: #2196f3;
-    }
-    .btn-blue:hover {
-      background-color: #1976d2;
-    }
-    .btn-red {
-      background-color: #f44336;
-    }
-    .btn-red:hover {
-      background-color: #c62828;
-    }
+    .btn-black { background-color: #333; }
+    .btn-black:hover { background-color: #111; }
+    .btn-green { background-color: #4caf50; }
+    .btn-green:hover { background-color: #388e3c; }
+    .btn-blue { background-color: #2196f3; }
+    .btn-blue:hover { background-color: #1976d2; }
+    .btn-red { background-color: #f44336; }
+    .btn-red:hover { background-color: #c62828; }
+    .btn-gray { background-color: #9e9e9e; }
+    .btn-gray:hover { background-color: #757575; }
   </style>
 </head>
 <body>
@@ -73,25 +60,64 @@
     <button class="btn-red" onclick="searchMichelin()">미슐랭 맛집 보기</button>
   </div>
 
+  <h3>❌ 제외할 음식 카테고리</h3>
+  <div class="exclude-container">
+    <button class="btn-gray" onclick="toggleExclude('한식')">한식 제외</button>
+    <button class="btn-gray" onclick="toggleExclude('일식')">일식 제외</button>
+    <button class="btn-gray" onclick="toggleExclude('중식')">중식 제외</button>
+    <button class="btn-gray" onclick="toggleExclude('양식')">양식 제외</button>
+    <button class="btn-gray" onclick="toggleExclude('태국')">태국 제외</button>
+    <button class="btn-gray" onclick="toggleExclude('베트남')">베트남 제외</button>
+    <button class="btn-gray" onclick="toggleExclude('기타')">기타 제외</button>
+  </div>
+
   <script>
     const foods = [
-      { name: "김치찌개", desc: "한국인의 소울푸드, 얼큰하고 따뜻해!" },
-      { name: "제육볶음", desc: "매콤달콤, 스트레스를 날려주는 고기 한판!" },
-      { name: "비빔밥", desc: "다채로운 재료와 고추장 한 스푼!" },
-      { name: "치킨", desc: "언제 먹어도 옳은 국민 야식" },
-      { name: "초밥", desc: "간편하고 고급진 한끼!" },
-      { name: "파스타", desc: "크림 or 토마토? 둘 다 맛있지!" },
-      { name: "피자", desc: "치즈 듬뿍! 혼자 먹기엔 너무 많다!" },
-      { name: "돈까스", desc: "바삭한 튀김과 부드러운 고기" },
-      { name: "라면", desc: "언제 먹어도 맛있는 국민 간식" },
-      { name: "떡볶이", desc: "맵고 달콤한 최고의 간식" }
+      { name: "김치찌개", desc: "한국인의 소울푸드, 얼큰하고 따뜻해!", category: "한식" },
+      { name: "제육볶음", desc: "매콤달콤한 고기 한 판!", category: "한식" },
+      { name: "비빔밥", desc: "다채로운 재료와 고추장 한 스푼!", category: "한식" },
+      { name: "불고기", desc: "달달하고 부드러운 한국식 BBQ", category: "한식" },
+      { name: "치킨", desc: "언제나 옳은 국민 야식", category: "한식" },
+      { name: "초밥", desc: "간편하고 고급진 한끼!", category: "일식" },
+      { name: "라멘", desc: "진한 국물의 일본 라면", category: "일식" },
+      { name: "우동", desc: "쫄깃한 면발과 따뜻한 국물", category: "일식" },
+      { name: "텐동", desc: "바삭한 튀김 덮밥", category: "일식" },
+      { name: "짜장면", desc: "단짠단짠 중화면요리", category: "중식" },
+      { name: "짬뽕", desc: "매콤하고 해물 가득한 국물", category: "중식" },
+      { name: "마파두부", desc: "얼얼하고 고소한 중식", category: "중식" },
+      { name: "파스타", desc: "크림 or 토마토, 당신의 선택은?", category: "양식" },
+      { name: "피자", desc: "치즈 듬뿍! 바삭한 도우", category: "양식" },
+      { name: "스테이크", desc: "고기의 진수, 제대로 된 한 점", category: "양식" },
+      { name: "팟타이", desc: "달콤 짭짤 태국 볶음면", category: "태국" },
+      { name: "똠얌꿍", desc: "시고 매운 새우국", category: "태국" },
+      { name: "쌀국수", desc: "담백하고 향긋한 베트남 면요리", category: "베트남" },
+      { name: "반미", desc: "베트남식 바게트 샌드위치", category: "베트남" },
+      { name: "햄버거", desc: "패스트푸드의 정석!", category: "기타" },
     ];
 
     let currentFood = null;
+    const excluded = new Set();
+
+    function toggleExclude(cat) {
+      if (excluded.has(cat)) {
+        excluded.delete(cat);
+        alert(cat + " 다시 포함됩니다");
+      } else {
+        excluded.add(cat);
+        alert(cat + " 제외합니다");
+      }
+      showRandomFood();
+    }
 
     function showRandomFood() {
-      const i = Math.floor(Math.random() * foods.length);
-      currentFood = foods[i];
+      const filtered = foods.filter(f => !excluded.has(f.category));
+      if (filtered.length === 0) {
+        document.getElementById("food").textContent = "추천할 음식이 없습니다";
+        document.getElementById("desc").textContent = "제외를 줄여보세요";
+        return;
+      }
+      const i = Math.floor(Math.random() * filtered.length);
+      currentFood = filtered[i];
       document.getElementById("food").textContent = currentFood.name;
       document.getElementById("desc").textContent = currentFood.desc;
     }
@@ -110,11 +136,11 @@
 
     function searchMichelin() {
       if (!currentFood) return alert("먼저 음식 추천을 받아주세요!");
-      const query = encodeURIComponent(currentFood.name);
+      const category = currentFood.category;
+      const query = encodeURIComponent(category);
       window.open(`https://guide.michelin.com/kr/ko/restaurants?q=${query}`, "_blank");
     }
 
-    // 페이지 로딩 시 기본 음식 하나 보여주기
     showRandomFood();
   </script>
 </body>
