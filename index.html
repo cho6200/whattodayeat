@@ -18,11 +18,19 @@
     .desc {
       color: gray;
       font-size: 1.1rem;
-      margin-bottom: 30px;
+      margin-bottom: 20px;
+    }
+    img {
+      width: 300px;
+      height: auto;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     }
     button {
       padding: 10px 20px;
-      background-color: #f76c6c;
+      margin: 10px;
+      background-color: #4caf50;
       color: white;
       border: none;
       border-radius: 10px;
@@ -30,40 +38,139 @@
       font-size: 1rem;
     }
     button:hover {
-      background-color: #e65a5a;
+      background-color: #388e3c;
     }
   </style>
 </head>
 <body>
   <h1>🍽 오늘 뭐 먹지?</h1>
+  <img id="food-img" src="" alt="음식 이미지" />
   <p class="food" id="food">불러오는 중...</p>
   <p class="desc" id="desc"></p>
   <button onclick="showRandomFood()">다른 거 추천해줘!</button>
-
-  <!-- 여기에 광고 코드 넣으면 됨 -->
-  <!-- 예: <div id="ad-top">[광고]</div> -->
+  <button onclick="searchNearby()">주변 가게 찾기</button>
 
   <script>
     const foods = [
-      { name: "김치찌개", desc: "한국인의 소울푸드, 얼큰하고 따뜻해!" },
-      { name: "제육볶음", desc: "매콤달콤, 스트레스 날려주는 고기 한판!" },
-      { name: "쌀국수", desc: "가볍고 시원한 베트남 스타일 국수" },
-      { name: "파스타", desc: "크림 or 토마토? 둘 다 맛있지!" },
-      { name: "치킨", desc: "언제 먹어도 옳은 국민 야식" },
-      { name: "초밥", desc: "간편하고 고급진 한끼!" },
-      { name: "떡볶이", desc: "매운맛이 땡기는 날엔 역시 이거지" },
-      { name: "마라탕", desc: "강렬한 중독성, 호불호 있지만 한번 빠지면 못나옴" },
-      { name: "냉면", desc: "더운 날엔 시원한 냉면 한 그릇!" },
-      { name: "부대찌개", desc: "햄+라면+김치=환상의 조합!" }
+      {
+        name: "김치찌개",
+        desc: "한국인의 소울푸드, 얼큰하고 따뜻해!",
+        img: "https://cdn.pixabay.com/photo/2020/12/11/12/06/kimchi-5823461_1280.jpg"
+      },
+      {
+        name: "제육볶음",
+        desc: "매콤달콤, 스트레스를 날려주는 고기 한판!",
+        img: "https://cdn.pixabay.com/photo/2021/10/11/14/14/korean-food-6700600_1280.jpg"
+      },
+      {
+        name: "비빔밥",
+        desc: "다채로운 재료와 고추장 한 스푼!",
+        img: "https://cdn.pixabay.com/photo/2017/03/27/14/56/bibimbap-2178873_1280.jpg"
+      },
+      {
+        name: "치킨",
+        desc: "언제 먹어도 옳은 국민 야식",
+        img: "https://cdn.pixabay.com/photo/2016/03/05/19/02/fried-chicken-1239247_1280.jpg"
+      },
+      {
+        name: "초밥",
+        desc: "간편하고 고급진 한끼!",
+        img: "https://cdn.pixabay.com/photo/2016/11/23/15/38/sushi-1850495_1280.jpg"
+      },
+      {
+        name: "파스타",
+        desc: "크림 or 토마토? 둘 다 맛있지!",
+        img: "https://cdn.pixabay.com/photo/2014/12/21/23/28/pasta-576182_1280.png"
+      },
+      {
+        name: "피자",
+        desc: "치즈 듬뿍! 혼자 먹기엔 너무 많다!",
+        img: "https://cdn.pixabay.com/photo/2017/12/09/08/18/pizza-3007395_1280.jpg"
+      },
+      {
+        name: "돈까스",
+        desc: "바삭한 튀김과 부드러운 고기",
+        img: "https://cdn.pixabay.com/photo/2022/04/07/13/17/tonkatsu-7115192_1280.jpg"
+      },
+      {
+        name: "라면",
+        desc: "언제 먹어도 맛있는 국민 간식",
+        img: "https://cdn.pixabay.com/photo/2022/04/10/09/24/ramen-7122733_1280.jpg"
+      },
+      {
+        name: "쌀국수",
+        desc: "가볍고 시원한 베트남 스타일 국수",
+        img: "https://cdn.pixabay.com/photo/2018/03/19/22/00/pho-3230341_1280.jpg"
+      },
+      {
+        name: "떡볶이",
+        desc: "맵고 달콤한 최고의 간식",
+        img: "https://cdn.pixabay.com/photo/2021/02/11/07/50/tteokbokki-6003636_1280.jpg"
+      },
+      {
+        name: "스테이크",
+        desc: "육즙 가득 고급진 저녁",
+        img: "https://cdn.pixabay.com/photo/2017/03/10/13/38/steak-2136298_1280.jpg"
+      },
+      {
+        name: "햄버거",
+        desc: "패티 + 치즈 + 번 = 완벽 조합",
+        img: "https://cdn.pixabay.com/photo/2016/03/05/19/02/hamburger-1238246_1280.jpg"
+      },
+      {
+        name: "샐러드",
+        desc: "가볍게 한 끼, 몸도 마음도 가볍게!",
+        img: "https://cdn.pixabay.com/photo/2015/04/08/13/13/food-712665_1280.jpg"
+      },
+      {
+        name: "아이스크림",
+        desc: "달콤하게 당 충전!",
+        img: "https://cdn.pixabay.com/photo/2017/04/23/10/57/ice-cream-2256892_1280.jpg"
+      },
+      {
+        name: "냉면",
+        desc: "더운 날엔 시원한 냉면!",
+        img: "https://cdn.pixabay.com/photo/2021/07/25/00/43/korean-cuisine-6491290_1280.jpg"
+      },
+      {
+        name: "갈비탕",
+        desc: "진하게 고운 국물, 정성 담은 고기탕",
+        img: "https://cdn.pixabay.com/photo/2022/09/14/08/21/beef-7453035_1280.jpg"
+      },
+      {
+        name: "설렁탕",
+        desc: "속 따뜻하게 채우는 국밥 한그릇",
+        img: "https://cdn.pixabay.com/photo/2023/04/18/14/50/seolleongtang-7934017_1280.jpg"
+      },
+      {
+        name: "마라탕",
+        desc: "중독되는 매운맛, 뜨끈한 국물",
+        img: "https://cdn.pixabay.com/photo/2021/02/21/10/21/malatang-6035181_1280.jpg"
+      },
+      {
+        name: "샤브샤브",
+        desc: "가족끼리 푸짐하게 즐기는 샤브샤브",
+        img: "https://cdn.pixabay.com/photo/2021/02/07/04/23/hot-pot-5990322_1280.jpg"
+      }
     ];
+
+    let currentFood = null;
 
     function showRandomFood() {
       const i = Math.floor(Math.random() * foods.length);
-      document.getElementById("food").textContent = foods[i].name;
-      document.getElementById("desc").textContent = foods[i].desc;
+      currentFood = foods[i];
+      document.getElementById("food").textContent = currentFood.name;
+      document.getElementById("desc").textContent = currentFood.desc;
+      document.getElementById("food-img").src = currentFood.img;
     }
 
-    showRandomFood(); // 첫 화면에 자동 표시
+    function searchNearby() {
+      if (!currentFood) return alert("먼저 음식 추천을 받아주세요!");
+      const query = encodeURIComponent(currentFood.name + " 맛집");
+      window.open(`https://map.naver.com/v5/search/${query}`, "_blank");
+    }
+
+    showRandomFood(); // 처음 로딩 시 음식 추천
   </script>
 </body>
 </html>
