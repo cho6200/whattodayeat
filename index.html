@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>오늘 뭐 먹지?</title>
   <style>
     body {
@@ -18,7 +18,11 @@
     .desc {
       color: gray;
       font-size: 1.1rem;
-      margin-bottom: 30px;
+      margin-bottom: 20px;
+    }
+    #food-img {
+      max-width: 300px;
+      margin: 10px auto;
     }
     .button-container {
       display: flex;
@@ -69,6 +73,7 @@
 <body>
   <h1>🍽 오늘 뭐 먹지?</h1>
   <p class="food" id="food">불러오는 중...</p>
+  <img id="food-img" src="" alt="음식 이미지" />
   <p class="desc" id="desc"></p>
 
   <div class="button-container">
@@ -86,80 +91,13 @@
     <button class="btn-gray" id="btn-양식" onclick="toggleExclude('양식')">양식</button>
     <button class="btn-gray" id="btn-태국" onclick="toggleExclude('태국')">태국</button>
     <button class="btn-gray" id="btn-베트남" onclick="toggleExclude('베트남')">베트남</button>
+    <button class="btn-gray" id="btn-멕시칸" onclick="toggleExclude('멕시칸')">멕시칸</button>
+    <button class="btn-gray" id="btn-카페" onclick="toggleExclude('카페')">카페</button>
   </div>
 
   <script>
-    const foods = [
-      { name: "김치찌개", desc: "한국인의 소울푸드, 얼큰하고 따뜻해!", category: "한식" },
-      { name: "제육볶음", desc: "매콤달콤한 고기 한 판!", category: "한식" },
-      { name: "비빔밥", desc: "다채로운 재료와 고추장 한 스푼!", category: "한식" },
-      { name: "불고기", desc: "달달하고 부드러운 한국식 BBQ", category: "한식" },
-      { name: "치킨", desc: "언제나 옳은 국민 야식", category: "한식" },
-      { name: "초밥", desc: "간편하고 고급진 한끼!", category: "일식" },
-      { name: "라멘", desc: "진한 국물의 일본 라면", category: "일식" },
-      { name: "우동", desc: "쫄깃한 면발과 따뜻한 국물", category: "일식" },
-      { name: "텐동", desc: "바삭한 튀김 덮밥", category: "일식" },
-      { name: "짜장면", desc: "단짠단짠 중화면요리", category: "중식" },
-      { name: "짬뽕", desc: "매콤하고 해물 가득한 국물", category: "중식" },
-      { name: "마파두부", desc: "얼얼하고 고소한 중식", category: "중식" },
-      { name: "파스타", desc: "크림 or 토마토, 당신의 선택은?", category: "양식" },
-      { name: "피자", desc: "치즈 듬뿍! 바삭한 도우", category: "양식" },
-      { name: "스테이크", desc: "고기의 진수, 제대로 된 한 점", category: "양식" },
-      { name: "햄버거", desc: "패스트푸드의 정석!", category: "양식" },
-      { name: "팟타이", desc: "달콤 짭짤 태국 볶음면", category: "태국" },
-      { name: "똠얌꿍", desc: "시고 매운 새우국", category: "태국" },
-      { name: "쌀국수", desc: "담백하고 향긋한 베트남 면요리", category: "베트남" },
-      { name: "반미", desc: "베트남식 바게트 샌드위치", category: "베트남" }
-    ];
-
-    let currentFood = null;
-    const excluded = new Set();
-
-    function toggleExclude(cat) {
-      const btn = document.getElementById("btn-" + cat);
-      if (excluded.has(cat)) {
-        excluded.delete(cat);
-        btn.classList.remove("btn-excluded");
-      } else {
-        excluded.add(cat);
-        btn.classList.add("btn-excluded");
-      }
-      showRandomFood();
-    }
-
-    function showRandomFood() {
-      const filtered = foods.filter(f => !excluded.has(f.category));
-      if (filtered.length === 0) {
-        document.getElementById("food").textContent = "추천할 음식이 없습니다";
-        document.getElementById("desc").textContent = "제외를 줄여보세요";
-        return;
-      }
-      const i = Math.floor(Math.random() * filtered.length);
-      currentFood = filtered[i];
-      document.getElementById("food").textContent = currentFood.name;
-      document.getElementById("desc").textContent = currentFood.desc;
-    }
-
-    function searchNearby() {
-      if (!currentFood) return alert("먼저 음식 추천을 받아주세요!");
-      const query = encodeURIComponent(currentFood.name + " 맛집");
-      window.open(`https://map.naver.com/v5/search/${query}`, "_blank");
-    }
-
-    function searchBlueRibbon() {
-      if (!currentFood) return alert("먼저 음식 추천을 받아주세요!");
-      const query = encodeURIComponent(currentFood.name);
-      window.open(`https://bluer.co.kr/search?query=${query}`, "_blank");
-    }
-
-    function searchMichelin() {
-      if (!currentFood) return alert("먼저 음식 추천을 받아주세요!");
-      const category = currentFood.category;
-      const query = encodeURIComponent(category);
-      window.open(`https://guide.michelin.com/kr/ko/restaurants?q=${query}`, "_blank");
-    }
-
-    showRandomFood();
+    // 음식 목록은 다음 메시지에서 이어서 제공됩니다.
   </script>
 </body>
 </html>
+
