@@ -60,18 +60,27 @@
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 8px;
+      gap: 6px;
+      max-width: 500px;
+      margin: 0 auto;
     }
+
     .cat-btn {
-      min-width: 40px;
-      padding: 4px 6px;
-      font-size: 0.85rem;
+      width: 80px;
+      height: 30px;
+      padding: 2px 4px;
+      font-size: 0.75rem;
       border: 1px solid #ccc;
-      border-radius: 4px;
+      border-radius: 5px;
       background: white;
       color: black;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
     }
+
     .btn-excluded {
       color: red;
       text-decoration: line-through;
@@ -146,7 +155,7 @@
         btn.classList.add("btn-excluded");
       }
 
-      // 새로고침 조건: 현재 표시된 음식이 이제 제외된 카테고리에 포함될 때만
+      // 현재 음식이 제외된 카테고리에 속하면 자동 추천 변경
       if (current && excluded.has(current.category)) {
         showRandomFood();
       }
