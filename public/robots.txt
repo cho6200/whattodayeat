@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://오늘뭐먹지.kr/sitemap.xml
