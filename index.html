@@ -63,8 +63,9 @@
       gap: 8px;
     }
     .cat-btn {
-      padding: 6px 12px;
-      font-size: 0.9rem;
+      min-width: 70px;
+      padding: 5px 10px;
+      font-size: 0.85rem;
       border: 1px solid #ccc;
       border-radius: 8px;
       background: white;
@@ -114,8 +115,7 @@
       { name: "팟타이", desc: "달콤 짭짤 볶음면", category: "태국" },
       { name: "쌀국수", desc: "담백한 국물의 베트남면", category: "베트남" },
       { name: "타코", desc: "멕시코 길거리 대표", category: "멕시칸" },
-      { name: "아메리카노", desc: "깔끔하고 진한 맛", category: "카페" },
-      // 더 많은 음식 추가 가능
+      { name: "아메리카노", desc: "깔끔하고 진한 맛", category: "카페" }
     ];
 
     function showRandomFood() {
@@ -132,15 +132,24 @@
     }
 
     function toggleExclude(category) {
+      const currentFood = document.getElementById("food").textContent;
+      const current = foods.find(f => f.name === currentFood);
+
       const btn = document.getElementById(`btn-${category}`);
-      if (excluded.has(category)) {
+      const isExcluded = excluded.has(category);
+
+      if (isExcluded) {
         excluded.delete(category);
         btn.classList.remove("btn-excluded");
       } else {
         excluded.add(category);
         btn.classList.add("btn-excluded");
       }
-      showRandomFood();
+
+      // 새로고침 조건: 현재 표시된 음식이 이제 제외된 카테고리에 포함될 때만
+      if (current && excluded.has(current.category)) {
+        showRandomFood();
+      }
     }
 
     function searchNearby() {
@@ -173,4 +182,3 @@
   </script>
 </body>
 </html>
-
