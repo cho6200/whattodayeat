@@ -1,14 +1,17 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>오늘 뭐 먹지?</title>
   <style>
     body {
       font-family: sans-serif;
       text-align: center;
       padding: 40px;
+    }
+    h1 {
+      font-size: 2.2rem;
     }
     .food {
       font-size: 2rem;
@@ -18,62 +21,71 @@
     .desc {
       color: gray;
       font-size: 1.1rem;
-      margin-bottom: 20px;
-    }
-    #food-img {
-      max-width: 300px;
-      margin: 10px auto;
+      margin-bottom: 30px;
     }
     .button-container {
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 12px;
-      margin-bottom: 30px;
+      margin-bottom: 40px;
     }
     button {
       padding: 12px 20px;
+      width: 250px;
       font-size: 1rem;
       border: none;
       border-radius: 10px;
       cursor: pointer;
       color: white;
     }
-    .btn-black { background-color: #333; width: 250px; }
+    .btn-black { background-color: #333; }
     .btn-black:hover { background-color: #111; }
-    .btn-green { background-color: #4caf50; width: 250px; }
+    .btn-green { background-color: #4caf50; }
     .btn-green:hover { background-color: #388e3c; }
-    .btn-blue { background-color: #2196f3; width: 250px; }
+    .btn-blue { background-color: #2196f3; }
     .btn-blue:hover { background-color: #1976d2; }
-    .btn-red { background-color: #f44336; width: 250px; }
+    .btn-red { background-color: #f44336; }
     .btn-red:hover { background-color: #c62828; }
-    .btn-gray {
-      background-color: white;
-      color: black;
-      border: 1px solid #ccc;
-      width: 90px;
-    }
-    .btn-gray:hover {
-      background-color: #eee;
-    }
-    .btn-excluded {
-      text-decoration: line-through;
-      color: red;
-      border-color: red;
-    }
-    .exclude-container {
+
+    .categories {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 10px;
-      margin-bottom: 30px;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .cat-btn {
+      padding: 6px 12px;
+      font-size: 0.9rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background: white;
+      color: black;
+      cursor: pointer;
+    }
+    .btn-excluded {
+      color: red;
+      text-decoration: line-through;
+      border-color: red;
     }
   </style>
 </head>
 <body>
-  <h1>🍽 오늘 뭐 먹지?</h1>
+  <h1>🍔🍜☕ 오늘 뭐 먹지?</h1>
+  
+  <div class="categories">
+    <button class="cat-btn" id="btn-한식" onclick="toggleExclude('한식')">🇰🇷 한식</button>
+    <button class="cat-btn" id="btn-일식" onclick="toggleExclude('일식')">🇯🇵 일식</button>
+    <button class="cat-btn" id="btn-중식" onclick="toggleExclude('중식')">🇨🇳 중식</button>
+    <button class="cat-btn" id="btn-양식" onclick="toggleExclude('양식')">🇺🇸 양식</button>
+    <button class="cat-btn" id="btn-태국" onclick="toggleExclude('태국')">🇹🇭 태국</button>
+    <button class="cat-btn" id="btn-베트남" onclick="toggleExclude('베트남')">🇻🇳 베트남</button>
+    <button class="cat-btn" id="btn-멕시칸" onclick="toggleExclude('멕시칸')">🇲🇽 멕시칸</button>
+    <button class="cat-btn" id="btn-카페" onclick="toggleExclude('카페')">☕ 카페</button>
+  </div>
+
   <p class="food" id="food">불러오는 중...</p>
-  <img id="food-img" src="" alt="음식 이미지" />
   <p class="desc" id="desc"></p>
 
   <div class="button-container">
@@ -83,83 +95,102 @@
     <button class="btn-red" onclick="searchMichelin()">미슐랭 맛집 찾기</button>
   </div>
 
-  <h3>❌ 제외할 음식 카테고리</h3>
-  <div class="exclude-container">
-    <button class="btn-gray" id="btn-한식" onclick="toggleExclude('한식')">한식</button>
-    <button class="btn-gray" id="btn-일식" onclick="toggleExclude('일식')">일식</button>
-    <button class="btn-gray" id="btn-중식" onclick="toggleExclude('중식')">중식</button>
-    <button class="btn-gray" id="btn-양식" onclick="toggleExclude('양식')">양식</button>
-    <button class="btn-gray" id="btn-태국" onclick="toggleExclude('태국')">태국</button>
-    <button class="btn-gray" id="btn-베트남" onclick="toggleExclude('베트남')">베트남</button>
-    <button class="btn-gray" id="btn-멕시칸" onclick="toggleExclude('멕시칸')">멕시칸</button>
-    <button class="btn-gray" id="btn-카페" onclick="toggleExclude('카페')">카페</button>
-  </div>
-
   <script>
+    const excluded = new Set();
+
     const foods = [
       { name: "김치찌개", desc: "한국인의 소울푸드", category: "한식" },
-      { name: "제육볶음", desc: "매콤한 고기 볶음", category: "한식" },
-      { name: "비빔밥", desc: "재료 풍부한 한 그릇", category: "한식" },
-      { name: "불고기", desc: "달달한 소고기 요리", category: "한식" },
-      { name: "삼겹살", desc: "한국인의 BBQ", category: "한식" },
-      { name: "치킨", desc: "국민 간식 치느님", category: "한식" },
-      { name: "된장찌개", desc: "구수한 전통 찌개", category: "한식" },
-      { name: "갈비찜", desc: "부드럽고 달달한 고기", category: "한식" },
-      { name: "냉면", desc: "시원한 면요리", category: "한식" },
-      { name: "감자탕", desc: "등뼈 해장국", category: "한식" },
-      { name: "오징어볶음", desc: "매콤한 해물 볶음", category: "한식" },
-      { name: "콩나물국밥", desc: "해장에 딱 좋은 국밥", category: "한식" },
-      { name: "칼국수", desc: "쫄깃한 국수와 진한 육수", category: "한식" },
+      { name: "제육볶음", desc: "매콤한 고기 반찬", category: "한식" },
+      { name: "비빔밥", desc: "고추장 쓱쓱 비벼 먹는", category: "한식" },
+      { name: "불고기", desc: "달달한 고기 한판", category: "한식" },
+      { name: "된장찌개", desc: "구수한 전통의 맛", category: "한식" },
+      { name: "치킨", desc: "국민 야식의 정석", category: "한식" },
+      { name: "라면", desc: "간편한 든든함", category: "한식" },
+      { name: "떡볶이", desc: "맵고 달달한 간식", category: "한식" },
+      { name: "삼겹살", desc: "불판 위 고기의 향연", category: "한식" },
       { name: "순두부찌개", desc: "매콤하고 부드러운 찌개", category: "한식" },
-      { name: "닭갈비", desc: "매콤한 닭고기 철판요리", category: "한식" },
-      { name: "초밥", desc: "생선과 밥의 조화", category: "일식" },
-      { name: "라멘", desc: "진한 일본 라면", category: "일식" },
-      { name: "우동", desc: "쫄깃한 면과 국물", category: "일식" },
-      { name: "돈카츠", desc: "바삭한 튀김 돈가스", category: "일식" },
-      { name: "텐동", desc: "튀김덮밥", category: "일식" },
-      { name: "오코노미야끼", desc: "일본식 부침개", category: "일식" },
-      { name: "규동", desc: "소고기 덮밥", category: "일식" },
-      { name: "타코야끼", desc: "문어볼 간식", category: "일식" },
-      { name: "짬뽕", desc: "매콤한 해물 국물면", category: "중식" },
-      { name: "짜장면", desc: "단짠 중화요리", category: "중식" },
-      { name: "탕수육", desc: "바삭한 고기 튀김", category: "중식" },
-      { name: "마라탕", desc: "얼얼한 중국 국물", category: "중식" },
-      { name: "꿔바로우", desc: "달콤한 찹쌀 탕수육", category: "중식" },
-      { name: "볶음밥", desc: "간단한 한 끼", category: "중식" },
-      { name: "깐풍기", desc: "매콤한 닭 튀김", category: "중식" },
-      { name: "파스타", desc: "이탈리안 면 요리", category: "양식" },
-      { name: "피자", desc: "치즈 가득 피자", category: "양식" },
-      { name: "스테이크", desc: "고급 고기 요리", category: "양식" },
-      { name: "햄버거", desc: "패스트푸드 대표", category: "양식" },
-      { name: "리조또", desc: "크리미한 쌀 요리", category: "양식" },
-      { name: "샐러드", desc: "가볍고 건강한 한끼", category: "양식" },
-      { name: "감바스", desc: "새우 올리브 오일 볶음", category: "양식" },
-      { name: "크림파스타", desc: "부드러운 파스타", category: "양식" },
-      { name: "토마토파스타", desc: "산뜻한 토마토 맛", category: "양식" },
-      { name: "팟타이", desc: "태국식 볶음면", category: "태국" },
-      { name: "똠얌꿍", desc: "매운 새우국", category: "태국" },
-      { name: "카오팟", desc: "태국식 볶음밥", category: "태국" },
-      { name: "카이팟멧마무엉", desc: "닭고기 캐슈넛 볶음", category: "태국" },
-      { name: "쌀국수", desc: "베트남 국수", category: "베트남" },
+      { name: "초밥", desc: "신선한 생선의 맛", category: "일식" },
+      { name: "라멘", desc: "일본식 진한 국물", category: "일식" },
+      { name: "우동", desc: "쫄깃한 면발과 국물", category: "일식" },
+      { name: "규동", desc: "달달한 소고기 덮밥", category: "일식" },
+      { name: "가츠동", desc: "돈까스 덮밥", category: "일식" },
+      { name: "짜장면", desc: "중식 대표 면요리", category: "중식" },
+      { name: "짬뽕", desc: "매콤한 해물국물", category: "중식" },
+      { name: "탕수육", desc: "달콤한 소스와 튀김", category: "중식" },
+      { name: "마파두부", desc: "얼얼한 두부요리", category: "중식" },
+      { name: "양장피", desc: "쫄깃한 중식 샐러드", category: "중식" },
+      { name: "파스타", desc: "크림/토마토/오일 선택!", category: "양식" },
+      { name: "피자", desc: "치즈 듬뿍 한 조각", category: "양식" },
+      { name: "스테이크", desc: "고기의 끝판왕", category: "양식" },
+      { name: "햄버거", desc: "든든한 한끼 패스트푸드", category: "양식" },
+      { name: "그라탕", desc: "치즈 가득 오븐 요리", category: "양식" },
+      { name: "팟타이", desc: "달콤 짭짤 볶음면", category: "태국" },
+      { name: "똠얌꿍", desc: "매콤하고 시큼한 태국국물", category: "태국" },
+      { name: "쌀국수", desc: "담백한 국물의 베트남면", category: "베트남" },
       { name: "반미", desc: "바게트 샌드위치", category: "베트남" },
-      { name: "분짜", desc: "새콤한 쌀국수", category: "베트남" },
-      { name: "월남쌈", desc: "신선한 채소쌈", category: "베트남" },
-      { name: "타코", desc: "작은 멕시칸 또띠아", category: "멕시칸" },
-      { name: "부리또", desc: "두툼한 멕시칸 랩", category: "멕시칸" },
-      { name: "나쵸", desc: "살사와 치즈 칩스", category: "멕시칸" },
-      { name: "케사디야", desc: "치즈 또띠아 샌드", category: "멕시칸" },
-      { name: "엔칠라다", desc: "소스 덮은 또띠아", category: "멕시칸" },
-      { name: "아메리카노", desc: "기본 커피 메뉴", category: "카페" },
-      { name: "카페라떼", desc: "우유 듬뿍 커피", category: "카페" },
-      { name: "에스프레소", desc: "진한 원액 커피", category: "카페" },
-      { name: "바닐라라떼", desc: "달콤한 커피 음료", category: "카페" },
-      { name: "아이스초코", desc: "달달한 초콜릿 음료", category: "카페" },
-      { name: "크로와상", desc: "버터 풍미 빵", category: "카페" },
-      { name: "샌드위치", desc: "간단한 식사 대용", category: "카페" },
-      { name: "베이글", desc: "쫄깃한 빵", category: "카페" },
-      { name: "카푸치노", desc: "거품 많은 커피", category: "카페" },
-      { name: "플랫화이트", desc: "부드러운 에스프레소", category: "카페" }
+      { name: "타코", desc: "멕시코 길거리 대표", category: "멕시칸" },
+      { name: "부리또", desc: "한 손에 쥐는 한끼", category: "멕시칸" },
+      { name: "나쵸", desc: "바삭한 간식과 소스", category: "멕시칸" },
+      { name: "에스프레소", desc: "작지만 강한 한 잔", category: "카페" },
+      { name: "아메리카노", desc: "깔끔하고 진한 맛", category: "카페" },
+      { name: "카페라떼", desc: "부드러운 우유와 커피", category: "카페" },
+      { name: "카푸치노", desc: "풍성한 거품 한 잔", category: "카페" },
+      { name: "딸기라떼", desc: "상큼한 핑크 음료", category: "카페" },
+      { name: "디카페인", desc: "카페인이 부담될 때", category: "카페" }
     ];
+
+    function showRandomFood() {
+      const filtered = foods.filter(f => !excluded.has(f.category));
+      if (filtered.length === 0) {
+        document.getElementById("food").textContent = "추천할 음식이 없습니다";
+        document.getElementById("desc").textContent = "제외를 줄여보세요";
+        return;
+      }
+      const i = Math.floor(Math.random() * filtered.length);
+      const food = filtered[i];
+      document.getElementById("food").textContent = food.name;
+      document.getElementById("desc").textContent = food.desc;
+    }
+
+    function toggleExclude(category) {
+      const btn = document.getElementById(`btn-${category}`);
+      if (excluded.has(category)) {
+        excluded.delete(category);
+        btn.classList.remove("btn-excluded");
+      } else {
+        excluded.add(category);
+        btn.classList.add("btn-excluded");
+      }
+      showRandomFood();
+    }
+
+    function searchNearby() {
+      const foodName = document.getElementById("food").textContent;
+      if (!foodName || foodName.includes("불러오는 중")) return;
+      const query = encodeURIComponent(foodName + " 맛집");
+      window.open(`https://map.naver.com/v5/search/${query}`, "_blank");
+    }
+
+    function searchBlueRibbon() {
+      const foodName = document.getElementById("food").textContent;
+      if (!foodName || foodName.includes("불러오는 중")) return;
+      window.open(`https://bluer.co.kr/search?query=${encodeURIComponent(foodName)}`, "_blank");
+    }
+
+    function searchMichelin() {
+      const foodName = document.getElementById("food").textContent;
+      if (!foodName || foodName.includes("불러오는 중")) return;
+
+      const michelinMap = {
+        한식: "한식", 일식: "일식", 중식: "중식", 양식: "이탈리안",
+        태국: "태국", 베트남: "베트남", 멕시칸: "멕시칸", 카페: "디저트"
+      };
+      const category = foods.find(f => f.name === foodName)?.category;
+      const keyword = michelinMap[category] || foodName;
+      window.open(`https://guide.michelin.com/kr/ko/restaurants?q=${encodeURIComponent(keyword)}`, "_blank");
+    }
+
+    window.onload = showRandomFood;
   </script>
 </body>
 </html>
