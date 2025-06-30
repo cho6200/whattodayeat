@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>오늘 뭐 먹지? | AI 메뉴 추천</title>
+
+  <!-- ✅ SEO & Open Graph 메타태그 -->
+  <meta name="description" content="AI가 오늘 먹을 음식을 추천해주는 웹사이트. 한식, 일식, 중식 등 원하는 스타일을 선택하세요!">
+  <meta name="keywords" content="오늘 뭐 먹지, 메뉴 추천, AI 음식 추천, 점심 추천, 저녁 추천, 음식 랜덤 추천">
+  <meta name="robots" content="index, follow">
+  <meta name="author" content="오늘뭐먹지.kr">
+
+  <meta property="og:title" content="오늘 뭐 먹지? 🍜🍔☕">
+  <meta property="og:description" content="AI가 오늘 먹을 메뉴를 추천해드립니다.">
+  <meta property="og:url" content="https://오늘뭐먹지.kr">
+  <meta property="og:type" content="website">
+</head>
+
+<body>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      padding: 40px;
+    }
+    h1 {
+      font-size: 1.8rem;
+      color: #222;
+      margin-bottom: 10px;
+    }
+    .food {
+      font-size: 2.6rem;
+      font-weight: 800;
+      color: #ff5722;
+      margin: 30px 0 10px;
+    }
+    .desc {
+      color: gray;
+      font-size: 1.1rem;
+      margin-bottom: 30px;
+    }
+    .button-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 40px;
+    }
+    button {
+      padding: 12px 20px;
+      width: 250px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      color: white;
+    }
+    .btn-black { background-color: #333; }
+    .btn-black:hover { background-color: #111; }
+    .btn-green { background-color: #4caf50; }
+    .btn-green:hover { background-color: #388e3c; }
+    .btn-blue { background-color: #2196f3; }
+    .btn-blue:hover { background-color: #1976d2; }
+    .btn-red { background-color: #f44336; }
+    .btn-red:hover { background-color: #c62828; }
+
+    .category-label {
+      margin-top: 60px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #444;
+      margin-bottom: 10px;
+    }
+
+    .categories {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 6px;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .cat-btn {
+      width: 80px;
+      height: 30px;
+      padding: 2px 4px;
+      font-size: 0.75rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      background: white;
+      color: black;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .btn-excluded {
+      color: red;
+      text-decoration: line-through;
+      border-color: red;
+    }
+  </style>
+
+  <h1>🍔🍜☕<br />오늘 뭐 먹지?</h1>
+
+  <p class="food" id="food">불러오는 중...</p>
+  <p class="desc" id="desc"></p>
+
+  <div class="button-container">
+    <button class="btn-black" onclick="showRandomFood()">다른 거 추천해줘</button>
+    <button class="btn-green" onclick="searchNearby()">주변 맛집 찾기 (네이버 지도)</button>
+    <button class="btn-blue" onclick="searchBlueRibbon()">블루리본 맛집 찾기</button>
+    <button class="btn-red" onclick="searchMichelin()">미슐랭 맛집 찾기</button>
+  </div>
+
+  <div class="category-label">― 제외할 카테고리 ―</div>
+  <div class="categories">
+    <button class="cat-btn" id="btn-한식" onclick="toggleExclude('한식')">🇰🇷 한식</button>
+    <button class="cat-btn" id="btn-일식" onclick="toggleExclude('일식')">🇯🇵 일식</button>
+    <button class="cat-btn" id="btn-중식" onclick="toggleExclude('중식')">🇨🇳 중식</button>
+    <button class="cat-btn" id="btn-양식" onclick="toggleExclude('양식')">🇺🇸 양식</button>
+    <button class="cat-btn" id="btn-태국" onclick="toggleExclude('태국')">🇹🇭 태국</button>
+    <button class="cat-btn" id="btn-베트남" onclick="toggleExclude('베트남')">🇻🇳 베트남</button>
+    <button class="cat-btn" id="btn-멕시칸" onclick="toggleExclude('멕시칸')">🇲🇽 멕시칸</button>
+    <button class="cat-btn" id="btn-카페" onclick="toggleExclude('카페')">☕ 카페</button>
+  </div>
+
+  <script>
+    const excluded = new Set();
+
+    const foods = [
+      { name: "김치찌개", desc: "한국인의 소울푸드", category: "한식" },
+      { name: "초밥", desc: "신선한 생선의 맛", category: "일식" },
+      { name: "짜장면", desc: "중식 대표 면요리", category: "중식" },
+      { name: "파스타", desc: "크림/토마토/오일 선택!", category: "양식" },
+      { name: "팟타이", desc: "달콤 짭짤 볶음면", category: "태국" },
+      { name: "쌀국수", desc: "담백한 국물의 베트남면", category: "베트남" },
+      { name: "타코", desc: "멕시코 길거리 대표", category: "멕시칸" },
+      { name: "아메리카노", desc: "깔끔하고 진한 맛", category: "카페" }
+    ];
+
+    function showRandomFood() {
+      const filtered = foods.filter(f => !excluded.has(f.category));
+      if (filtered.length === 0) {
+        document.getElementById("food").textContent = "추천할 음식이 없습니다";
+        document.getElementById("desc").textContent = "제외를 줄여보세요";
+        return;
+      }
+      const i = Math.floor(Math.random() * filtered.length);
+      const food = filtered[i];
+      document.getElementById("food").textContent = food.name;
+      document.getElementById("desc").textContent = food.desc;
+    }
+
+    function toggleExclude(category) {
+      const currentFood = document.getElementById("food").textContent;
+      const current = foods.find(f => f.name === currentFood);
+
+      const btn = document.getElementById(`btn-${category}`);
+      const isExcluded = excluded.has(category);
+
+      if (isExcluded) {
+        excluded.delete(category);
+        btn.classList.remove("btn-excluded");
+      } else {
+        excluded.add(category);
+        btn.classList.add("btn-excluded");
+      }
+
+      if (current && excluded.has(current.category)) {
+        showRandomFood();
+      }
+    }
+
+    function searchNearby() {
+      const foodName = document.getElementById("food").textContent;
+      if (!foodName || foodName.includes("불러오는 중")) return;
+      const query = encodeURIComponent(foodName + " 맛집");
+      window.open(`https://map.naver.com/v5/search/${query}`, "_blank");
+    }
+
+    function searchBlueRibbon() {
+      const foodName = document.getElementById("food").textContent;
+      if (!foodName || foodName.includes("불러오는 중")) return;
+      window.open(`https://bluer.co.kr/search?query=${encodeURIComponent(foodName)}`, "_blank");
+    }
+
+    function searchMichelin() {
+      const foodName = document.getElementById("food").textContent;
+      if (!foodName || foodName.includes("불러오는 중")) return;
+      const michelinMap = {
+        한식: "한식", 일식: "일식", 중식: "중식", 양식: "이탈리안",
+        태국: "태국", 베트남: "베트남", 멕시칸: "멕시칸", 카페: "디저트"
+      };
+      const category = foods.find(f => f.name === foodName)?.category;
+      const keyword = michelinMap[category] || foodName;
+      window.open(`https://guide.michelin.com/kr/ko/restaurants?q=${encodeURIComponent(keyword)}`, "_blank");
+    }
+
+    window.onload = showRandomFood;
+  </script>
+</body>
+</html>
